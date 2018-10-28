@@ -11,41 +11,42 @@
     <LinearLayout
         android:gravity="center"
         android:background="#8af"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_margin="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
+        <TextView
+            android:text="Type"
+            android:layout_gravity="left"
+            android:textSize="25sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50sp"/>
+        <Spinner
+            android:id="@+id/type_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+        </Spinner>
+        <TextView
+        android:text="Description"
+        android:layout_gravity="left"
+        android:textSize="25sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+            android:layout_marginTop="50sp"/>
+        <EditText
+            android:hint="ex:8_north"
+            android:layout_gravity="top"
+            android:layout_width="match_parent"
+            android:layout_height="100sp" />
         <Button
-            android:id="@+id/button_start"
-            android:text="@string/start"
-            android:textSize="18sp"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/button_stop"
-            android:text="@string/stop"
-            android:textSize="18sp"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-
+            android:text="registration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30sp"/>
     </LinearLayout>
 
-    <ScrollView
-        android:layout_margin="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/text_view"
-            android:textColor="#000"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </ScrollView>
 
 </LinearLayout>
