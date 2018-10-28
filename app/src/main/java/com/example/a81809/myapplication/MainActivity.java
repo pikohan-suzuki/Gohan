@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         //パーミッションの確認
         final int requestCode = 1000;
         if (ContextCompat.checkSelfPermission(this,
@@ -110,8 +108,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         // 経度の表示
         TextView textView2 = findViewById(R.id.text_view2);
-        String str2 = "Longtude:" + location.getLongitude();
+        String str2 = "Longitude:" + location.getLongitude();
         textView2.setText(str2);
+
+        // 高さの表示
+        TextView textView3 = findViewById(R.id.text_view3);
+        String str3 = "Altitude:" + location.getAltitude();
+        textView3.setText(str3);
     }
 
     @Override
