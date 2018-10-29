@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="start">start</string>
+    <string name="stop">stop</string>
+    <string name="description">Description</string>
+    <string name="building_and_floor">Building and Floor</string>
+    <string name="point_number">Point Number</string>
+    <string name="ex_1">ex: 1</string>
 </resources>
