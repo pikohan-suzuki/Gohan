@@ -190,14 +190,14 @@ public class LocationActivity extends AppCompatActivity {
                     LocationRequest.PRIORITY_NO_POWER);
         }
 
-
+        //単位はms
         locationRequest.setInterval(60000);
 
         locationRequest.setFastestInterval(5000);
 
     }
 
-
+    //GPSが利用できるか確認
     private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder =
                 new LocationSettingsRequest.Builder();
