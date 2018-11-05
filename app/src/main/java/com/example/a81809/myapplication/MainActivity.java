@@ -3,13 +3,12 @@ package com.example.a81809.myapplication;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,55 +19,75 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d("MainActivity", "onCreate()");
 
-        if (Build.VERSION.SDK_INT >= 26) {
+        if(Build.VERSION.SDK_INT >= 23){
             checkPermission();
-        } else {
+        }
+        else{
             locationActivity();
         }
     }
 
+    // 位置情報許可の確認
     public void checkPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == getPackageManager().PERMISSION_GRANTED) {
+        // 既に許可している
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)==
+                PackageManager.PERMISSION_GRANTED){
+
             locationActivity();
-        } else {
+        }
+        // 拒否していた場合
+        else{
             requestLocationPermission();
         }
     }
 
+    // 許可を求める
     private void requestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_PERMISSION);
+
         } else {
-            Toast toast = Toast.makeText(this, "許可されないとアプリが実行できません", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this,
+                    "許可されないとアプリが実行できません", Toast.LENGTH_SHORT);
             toast.show();
+
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,},
                     REQUEST_PERMISSION);
+
         }
     }
 
+    // 結果の受け取り
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+
         if (requestCode == REQUEST_PERMISSION) {
-            //許可された
+            // 使用が許可された
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 locationActivity();
+
             } else {
-                //許可されなかった
-                Toast toast = Toast.makeText(this, "Nothing to do.", Toast.LENGTH_SHORT);
+                // それでも拒否された時の対応
+                Toast toast = Toast.makeText(this,
+                        "これ以上なにもできません", Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
     }
 
+    // Intent でLocation
     private void locationActivity() {
-        Intent intent = new Intent(getApplication(),LocationActivity.class);
+        Intent intent = new Intent(getApplication(), LocationActivity.class);
         startActivity(intent);
     }
-
-
 }
