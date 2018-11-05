@@ -1,13 +1,12 @@
 package com.example.a81809.myapplication;
 
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.location.Location;
-
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -15,22 +14,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.util.Date;
-
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +33,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import java.text.DateFormat;
+import java.util.Date;
 
 public class LocationActivity extends AppCompatActivity {
 
@@ -59,25 +48,24 @@ public class LocationActivity extends AppCompatActivity {
     private LocationRequest locationRequest;
     private Location location;
 
+    private EditText type;
+    private EditText number;
+    private EditText floor;
+
     private String lastUpdateTime;
     private Boolean requestingLocationUpdates;
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
     private int priority = 0;
+    private TextView textView;
+    private String textLog;
 
-    private Spinner type_spinner;
-    private EditText building_EditText;
-    private EditText des_EditText;
-    private TextView log_TextView;
-    private Button regButton;
-    private Button logButton;
-    private String spinnerItems[] = {
-            "Conner",
-            "Entrance",
-            "Other"
-    };
+    private double altitude =0;
+    private double latitude=0;
+    private double longitude=0;
 
-    private String saveData = "";
+    private int count;
 
+    private String str="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,51 +82,30 @@ public class LocationActivity extends AppCompatActivity {
         createLocationRequest();
         buildLocationSettingsRequest();
 
-        //スパイナーリストの内容を指定
-        type_spinner = findViewById(R.id.type_spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, spinnerItems
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        type_spinner.setAdapter(adapter);
-
-        building_EditText = findViewById(R.id.building_EditText);
-        des_EditText = findViewById(R.id.des_EditText);
-        regButton = findViewById(R.id.reg_button);
-        logButton = findViewById(R.id.Log_button);
-        log_TextView = findViewById(R.id.log_Text);
-//
-//
-//        textView = (TextView) findViewById(R.id.text_view);
-//        textLog = "onCreate()\n";
-//        textView.setText(textLog);
+        textView = (TextView) findViewById(R.id.text_view);;
+        textView.setText(str);
+        type = findViewById(R.id.type);
+        number = findViewById(R.id.number);
+        floor=findViewById(R.id.floor);
 
         // 測位開始
-        regButton.setOnClickListener(new View.OnClickListener() {
+        Button buttonStart = (Button) findViewById(R.id.button_start);
+        buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                count=1;
                 startLocationUpdates();
+            }
+        });
+
+        // 測位終了
+        Button buttonStop = (Button) findViewById(R.id.button_stop);
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 stopLocationUpdates();
             }
         });
-
-        logButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplication(), LogActivity.class);
-                intent.putExtra("saveData",saveData);
-                startActivity(intent);
-            }
-        });
-
-//        // 測位終了
-//        Button buttonStop = (Button) findViewById(R.id.button_stop);
-//        buttonStop.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                stopLocationUpdates();
-//            }
-//        });
 
     }
 
@@ -161,29 +128,28 @@ public class LocationActivity extends AppCompatActivity {
         // getLastLocation()からの情報がある場合のみ
         if (location != null) {
 
-            String dataInfo[] = {
-                    type_spinner.getSelectedItem().toString(),
-                    building_EditText.getText().toString(),
-                    des_EditText.getText().toString()
+            String fusedName[] = {
+                    "Latitude", "Longitude", "Accuracy",
+                    "Altitude", "Speed", "Bearing"
             };
-
-            double locationData[] = {
-                    location.getLatitude(),
-                    location.getLongitude(),
-                    location.getAltitude()
-            };
-
-            for (int i = 0; i < 3; i++) {
-                saveData += dataInfo[i];
-                saveData += ",";
-            }
-            for (int i = 0; i < 3; i++) {
-                saveData += String.valueOf(locationData[i]);
-                if (i != 2) {
-                    saveData += ",";
-                } else {
-                    saveData += "\n";
+            if(count<=2) {
+                if(count==1) {
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                    altitude = location.getAltitude();
+                }else{
+                    latitude = (latitude*(count-1) + location.getLatitude())/count;
+                    longitude = (longitude*(count-1)+location.getLongitude())/count;
+                    altitude = (altitude*(count-1)+location.getAltitude())/count;
                 }
+                count++;
+            }else if(count==3){
+                str+=("---------" + floor.getText()+"階 "+type.getText()+number.getText()+ " -----------\n");
+                str+=(latitude+"\n");
+                str+=(longitude+"\n");
+                str+=(altitude+"\n");
+                textView.setText(str);
+                count++;
             }
         }
     }
@@ -192,31 +158,47 @@ public class LocationActivity extends AppCompatActivity {
         locationRequest = new LocationRequest();
 
         if (priority == 0) {
+            // 高い精度の位置情報を取得したい場合
+            // インターバルを例えば5000msecに設定すれば
+            // マップアプリのようなリアルタイム測位となる
+            // 主に精度重視のためGPSが優先的に使われる
             locationRequest.setPriority(
                     LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         } else if (priority == 1) {
+            // バッテリー消費を抑えたい場合、精度は100mと悪くなる
+            // 主にwifi,電話網での位置情報が主となる
+            // この設定の例としては　setInterval(1時間)、setFastestInterval(1分)
             locationRequest.setPriority(
                     LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         } else if (priority == 2) {
-
+            // バッテリー消費を抑えたい場合、精度は10kmと悪くなる
             locationRequest.setPriority(
                     LocationRequest.PRIORITY_LOW_POWER);
-        } else {
 
+        } else {
+            // 受け身的な位置情報取得でアプリが自ら測位せず、
+            // 他のアプリで得られた位置情報は入手できる
             locationRequest.setPriority(
                     LocationRequest.PRIORITY_NO_POWER);
         }
 
-        //単位はms
-        locationRequest.setInterval(60000);
-
-        locationRequest.setFastestInterval(5000);
+        // アップデートのインターバル期間設定
+        // このインターバルは測位データがない場合はアップデートしません
+        // また状況によってはこの時間よりも長くなることもあり
+        // 必ずしも正確な時間ではありません
+        // 他に同様のアプリが短いインターバルでアップデートしていると
+        // それに影響されインターバルが短くなることがあります。
+        // 単位：msec
+        locationRequest.setInterval(1000);
+        // このインターバル時間は正確です。これより早いアップデートはしません。
+        // 単位：msec
+        locationRequest.setFastestInterval(1000);
 
     }
 
-    //GPSが利用できるか確認
+    // 端末で測位できる状態か確認する。wifi, GPSなどがOffになっているとエラー情報のダイアログが出る
     private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder =
                 new LocationSettingsRequest.Builder();
@@ -317,9 +299,6 @@ public class LocationActivity extends AppCompatActivity {
     }
 
     private void stopLocationUpdates() {
-//        textLog += "onStop()\n";
-//        textView.setText(textLog);
-
         if (!requestingLocationUpdates) {
             Log.d("debug", "stopLocationUpdates: " +
                     "updates never requested, no-op.");
